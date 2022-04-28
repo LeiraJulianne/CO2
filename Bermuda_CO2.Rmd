@@ -1,23 +1,34 @@
-#####Bermuda Atlantic Time Series-- ocean acidification##
-#1) Is surface ocean pCO2 increasing?
-#2) Is surface ocean seawater pH decreasing?
-#3) Is surface ocean omega decreasing?
-#Import data set
+---
+title: "Bermuda Atlantic Time Series-Ocean acidification"
+author: "Leira J. Centeno"
+date: '2022-04-25'
+output: 
+  html_document:
+   code_folding: "show" 
+  
+---
+**Introduction**
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
 
 #Load library
 
 library(tidyverse)
 library(seacarb)
 library(performance)
+
 #import BATS Bottle data from website
+
 bats_bottle <- read_table2("http://batsftp.bios.edu/BATS/bottle/bats_bottle.txt", 
                            col_names = FALSE, skip = 60)
-View(bats_bottle)
+#View(bats_bottle)
 
 #assign column column names to BATS data from website
 colnames(bats_bottle)=
   colnames(read_csv("http://batsftp.bios.edu/BATS/bottle/bats_bottle.txt", skip = 59))
-View(bats_bottle)
+#View(bats_bottle)
 
 #Varible names and units form BATS data
 #yyyymmdd = Year Month Day   
@@ -76,104 +87,146 @@ rename(DIC=CO2) %>%
          PO41!=-999,Sal1!=-999,lonW!=-99,latN!=-999) %>%
 mutate(carb(flag=15, var1=Alk*10^-6, var2=DIC*10^-6, S=Sal1, T=Temp, Patm=1, P=sea_pressure/10, Pt=PO41*10^-6, Sit=Si1*10^-6,
    k1k2="l", kf="x", ks="d", pHscale="T", b="u74", gas="potential", 
-    warn="y", eos="teos10", long=360-lonW, lat=latN))
+    warn="y", eos="teos10", long=lonW, lat=latN))
 
-view(bats_co2)
-
-#1) Is surface ocean pCO2 increasing?
+#view(bats_co2)
+```
+## 1) Is surface ocean pCO2 increasing?
+```{r,warning = FALSE, message = FALSE}
 bats_co2 %>% 
   ggplot()+
   geom_point(mapping = aes(x=decy, y=pCO2))+
-  geom_smooth(mapping = aes(x=decy, y=pCO2), method="lm")
+  geom_smooth(mapping = aes(x=decy, y=pCO2), method="lm")+
+  ylab(" pCO2") +
+  xlab("Years")+
+  coord_cartesian(xlim = c(1991,2020))+
+ annotate("text",x=2000, y= 445,label="R^2=0.17", size=6, color="red")+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor= element_blank(),
+        panel.background = element_blank(), #removes annoying gray area
+        axis.line= element_line(colour = "black"), #adds lines for the axes
+        text = element_text(size = 20))
+```
 
+### How to cuantify if its increasing?  
+```{r}
+pco2_model= with(bats_co2, lm(pCO2~I(decy-2000)))
+```
 
-#How to cuantify if its increasing? statistics 
-#First try
-#pco2_model= with(bats_co2, lm(pCO2~decy)
-#anova(pco2_model)
-#summary(pco2_model)
-#check_model(pco2_model)
-#
-##############Anova %>% p-value=<0.05 hay there's significance difference. 
-
-pco2_model= with(bats_co2,lm(pCO2~I(decy~2000)))
-anova(pco2_model)
+```{r}
+                                    data <- anova(pco2_model)
+                                    knitr::kable(data,
+                                               caption = "Anova for pCO2")
+```
+```{r}
+#DUDAAAAA
 summary(pco2_model)
 check_model(pco2_model)
+```
 
-#p-value=2.2e-16 there's significance difference. 
+p-value=2.2e-16 there's significance difference. 
 
-################
-#2) Is surface ocean seawater pH decreasing? Include full citation in Figure 1 caption. Be sure to discuss oxygen minium zones and uptake of oxygen by respiration! For example, the Gulf of Mexico or the Eastern Tropical Pacific have very low oxygen because it is consumed by the respiration of organic matter. Also be sure to explain all of your figures thoroughly. If you are not discussing the details of the figure, it should be removed. "The current determination method, measures DO in water content according to the diffusion rate of molecular oxygen. " comes up with an almost direct match on google search. This is plagiarism. Any copied text in the final paper will result in a failed term paper assignment.
-
-#OJO 1991 DATA
-#PLOT
+## 2) Is surface ocean seawater pH decreasing? 
+```{r, warning = FALSE, message = FALSE}
+  #PLOT
 bats_co2 %>% 
   ggplot()+
   geom_point(mapping = aes(x=decy, y=pH))+
   geom_smooth(mapping = aes(x=decy, y=pH), method="lm")+
     ylab(" pH") +
     xlab("Years")+
-  coord_cartesian(xlim = c(1991,2019))+
+  coord_cartesian(xlim = c(1991,2020))+
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor= element_blank(),
           panel.background = element_blank(), #removes annoying gray area
           axis.line= element_line(colour = "black"), #adds lines for the axes
           text = element_text(size = 20))
 
+```
+
+### How to cuantify if its increasing? 
+```{r}
 #How to cuantify if its increasing? statistics 
-pH_model= with(bats_co2, lm(pH~I(decy~2000)))
-anova(pH_model)
+pH_model= with(bats_co2, lm(pH~I(decy-2000)))
+```
+
+```{r}
+ data <- anova(pH_model)
+                          knitr::kable(data,
+                                  caption = "Anova for pH")
+```
+
+```{r}
 summary(pH_model)
 check_model(pH_model)
-#p-value = 1.461e-15 there's significance difference.
+```
 
-#lm(pCO2~I(decy~2000)))
+p-value = 1.461e-15 there's significance difference.
 
-#3) Is surface ocean omega decreasing?
-#for omega, this is the "seawater saturation state with respect to (aragonite/calcite)" W_Ar   W_Ca
-
+## 3a) Is surface ocean omega decreasing?
+```{r,warning = FALSE, message = FALSE}
 #ARAGONITE
 bats_co2 %>% 
   ggplot()+
   geom_point(mapping = aes(x=decy, y=OmegaAragonite))+
-  geom_smooth(mapping = aes(x=decy, y=OmegaAragonite), method="lm")
-
-#How to cuantify if its increasing? statistics 
+  geom_smooth(mapping = aes(x=decy, y=OmegaAragonite), method="lm") +
+  ylab("Omega Aragonite") +
+  xlab("Years")+
+  coord_cartesian(xlim = c(1991,2020))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor= element_blank(),
+        panel.background = element_blank(), #removes annoying gray area
+        axis.line= element_line(colour = "black"), #adds lines for the axes
+        text = element_text(size = 20))
+```
+### How to cuantify if its increasing? 
+```{r}
 OmeAragonite_model= with(bats_co2, lm(OmegaAragonite~decy))
-anova(OmeAragonite_model)
+```
+
+```{r}
+ data <- anova(OmeAragonite_model)
+                          knitr::kable(data,
+                                  caption = "Anova for Omega Aragonite")
+```
+
+```{r}
 summary(OmeAragonite_model)
 check_model(OmeAragonite_model)
-#p-value= 1.353e-08
+```
+p-value= 1.353e-08
 
+## 3b) Is surface ocean omega decreasing?
+```{r, warning = FALSE, message = FALSE}
 #Calcite
 bats_co2 %>% 
   ggplot()+
   geom_point(mapping = aes(x=decy, y=OmegaCalcite))+
-  geom_smooth(mapping = aes(x=decy, y=OmegaCalcite, method="lm"))
+  geom_smooth(mapping = aes(x=decy, y=OmegaCalcite, method="lm")) +
+  ylab(" Omega Calcite") +
+  xlab("Years")+
+  coord_cartesian(xlim = c(1991,2020))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor= element_blank(),
+        panel.background = element_blank(), #removes annoying gray area
+        axis.line= element_line(colour = "black"), #adds lines for the axes
+        text = element_text(size = 20))
+```
 
-#How to cuantify if its increasing? statistics 
+### How to cuantify if its increasing? 
+```{r}
 OmeCalcite_model= with(bats_co2, lm(OmegaCalcite~decy))
-anova(OmeCalcite_model)
+```
+
+```{r}
+ data <- anova(OmeCalcite_model)
+                          knitr::kable(data,
+                                  caption = "Anova for Omega Calcite")
+```
+
+```{r}
 summary(OmeCalcite_model)
 check_model(OmeCalcite_model)
-#p-value= 9.619e-12
+```
 
-
-##################
-#paper
-#Acceleration of ocean warming, salinification, deoxygenation and acidification in the surface subtropical North Atlantic Ocean
-
-
-##########
-#ggplot()+ geom_point(mapping = aes(x=sigma_theta, y= Depth,group= Season, color=Season), size=1,alpha=0.5)+
-#  facet_wrap(facets = "Season") SEPARATE PLOTS+
-#  scale_x_continuous(position= "top")+
-#  scale_y_reverse() +
-#  ylab("Depth (m)") +
-#  xlab("Density(kg/m^3)")+
-#  theme(panel.grid.major = element_blank(), 
-#        panel.grid.minor= element_blank(),
-#        panel.background = element_blank(), #removes annoying gray area
-#        axis.line= element_line(colour = "black"), #adds lines for the axes
-#        text = element_text(size = 20))
+p-value= 9.619e-12

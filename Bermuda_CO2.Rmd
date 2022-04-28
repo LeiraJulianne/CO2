@@ -9,6 +9,8 @@ output:
 ---
 **Introduction**
 
+Bermuda is an archipelago island located in the western North Atlantic Ocean compound of seven main islands and one hundred seventy islets (Rushe, G. et al., 2021). The Bermuda Institute of Ocean Science (BIOS) is located at the east end of the Island in the Ferry Reach, St. George’s. Bermuda Biological Station for Research (BBSR) it’s been there since 1932. Since 1991 Bermuda Atlantic Time Series-Ocean acidification (BATS) provides data sets in the world acquiring measurements of some parameters such as salinity, temperature, carbon dioxide, density, pressure and oxygen. The importance of the selected surface parameters is to follow the levels of the ocean acidification research. This report is going to present if surface water parameters are increasing or decreasing. With BATS  measurements of alcalinity  we could calculated others parameters like disolved inorganic carbon, pCO2, pH, omega. The worked data was provided by the BIOS **[website](http://bats.bios.edu/)**.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -100,7 +102,8 @@ bats_co2 %>%
   ylab(" pCO2") +
   xlab("Years")+
   coord_cartesian(xlim = c(1991,2020))+
- annotate("text",x=2000, y= 445,label="R^2=0.17", size=6, color="red")+
+ annotate("text",x=2000, y= 435,label="R^2=0.17", size=5, color="red")+
+   annotate("text",x=2000, y= 450,label="pCO2=1.83µatm*year/year", size=5, color="red")+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor= element_blank(),
         panel.background = element_blank(), #removes annoying gray area
@@ -108,7 +111,7 @@ bats_co2 %>%
         text = element_text(size = 20))
 ```
 
-### How to cuantify if its increasing?  
+ 
 ```{r}
 pco2_model= with(bats_co2, lm(pCO2~I(decy-2000)))
 ```
@@ -118,13 +121,7 @@ pco2_model= with(bats_co2, lm(pCO2~I(decy-2000)))
                                     knitr::kable(data,
                                                caption = "Anova for pCO2")
 ```
-```{r}
-#DUDAAAAA
-summary(pco2_model)
-check_model(pco2_model)
-```
-
-p-value=2.2e-16 there's significance difference. 
+Base on ANOVA results there is a significant difference of increasing pCO2 within the years. The p-value measure was 2.2e-16. The linear model has a positive increasing slope as consequence acidifying the seawater surface. 
 
 ## 2) Is surface ocean seawater pH decreasing? 
 ```{r, warning = FALSE, message = FALSE}
@@ -136,6 +133,8 @@ bats_co2 %>%
     ylab(" pH") +
     xlab("Years")+
   coord_cartesian(xlim = c(1991,2020))+
+   annotate("text",x=2008, y= 8.16,label="R^2=0.1526", size=5, color="red")+
+   annotate("text",x=2008, y= 8.17,label="pH=-0.0018375/year* 8.1070717", size=5, color="red")+
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor= element_blank(),
           panel.background = element_blank(), #removes annoying gray area
@@ -144,7 +143,7 @@ bats_co2 %>%
 
 ```
 
-### How to cuantify if its increasing? 
+
 ```{r}
 #How to cuantify if its increasing? statistics 
 pH_model= with(bats_co2, lm(pH~I(decy-2000)))
@@ -155,15 +154,10 @@ pH_model= with(bats_co2, lm(pH~I(decy-2000)))
                           knitr::kable(data,
                                   caption = "Anova for pH")
 ```
+Base on ANOVA results there is  a significant difference of decreasing pH within the years. The p-value measure was 1.461e-15. It was expected that the model for pH, based on pCO2 linear model will have positive increasing slope as consequence acidifying the seawater surface, but their a decreasing slope. Therefore, the seawater surface inst appear to be acidifying rapidly within the years. 
 
-```{r}
-summary(pH_model)
-check_model(pH_model)
-```
 
-p-value = 1.461e-15 there's significance difference.
-
-## 3a) Is surface ocean omega decreasing?
+## 3a) Is surface ocean omega Aragonite decreasing?
 ```{r,warning = FALSE, message = FALSE}
 #ARAGONITE
 bats_co2 %>% 
@@ -172,6 +166,8 @@ bats_co2 %>%
   geom_smooth(mapping = aes(x=decy, y=OmegaAragonite), method="lm") +
   ylab("Omega Aragonite") +
   xlab("Years")+
+   annotate("text",x=2005, y= 4.5,label="R^2=0.08046", size=5, color="red")+
+   annotate("text",x=2005, y= 4.4,label="Ω Aragonite=-0.007294*years/18.343854", size=5, color="red")+
   coord_cartesian(xlim = c(1991,2020))+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor= element_blank(),
@@ -179,7 +175,8 @@ bats_co2 %>%
         axis.line= element_line(colour = "black"), #adds lines for the axes
         text = element_text(size = 20))
 ```
-### How to cuantify if its increasing? 
+
+
 ```{r}
 OmeAragonite_model= with(bats_co2, lm(OmegaAragonite~decy))
 ```
@@ -190,13 +187,10 @@ OmeAragonite_model= with(bats_co2, lm(OmegaAragonite~decy))
                                   caption = "Anova for Omega Aragonite")
 ```
 
-```{r}
-summary(OmeAragonite_model)
-check_model(OmeAragonite_model)
-```
-p-value= 1.353e-08
+Base on ANOVA results there is  a significance of decreasing on Omega Aragonite within the years. The p-value measure was 1.353e-08. It was expected that the model for omega Argonite to be negative decreasing linear model, connected to the decreasing pH   sea water surface  within the years dissolving calcium carbonate affecting directly  calcium carbonate shells and skeletons.  
 
-## 3b) Is surface ocean omega decreasing?
+
+## 3b) Is surface ocean omega Calcite decreasing?
 ```{r, warning = FALSE, message = FALSE}
 #Calcite
 bats_co2 %>% 
@@ -205,7 +199,9 @@ bats_co2 %>%
   geom_smooth(mapping = aes(x=decy, y=OmegaCalcite, method="lm")) +
   ylab(" Omega Calcite") +
   xlab("Years")+
-  coord_cartesian(xlim = c(1991,2020))+
+  coord_cartesian(xlim = c(1991,2020), ylim = c(5,7))+
+    annotate("text",x=2005, y= 6.8,label="R^2=0.1137", size=5, color="red")+
+   annotate("text",x=2005, y= 7.0,label="Ω Calcite=-0.011681*years/29.074", size=5, color="red")+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor= element_blank(),
         panel.background = element_blank(), #removes annoying gray area
@@ -213,7 +209,7 @@ bats_co2 %>%
         text = element_text(size = 20))
 ```
 
-### How to cuantify if its increasing? 
+
 ```{r}
 OmeCalcite_model= with(bats_co2, lm(OmegaCalcite~decy))
 ```
@@ -224,9 +220,23 @@ OmeCalcite_model= with(bats_co2, lm(OmegaCalcite~decy))
                                   caption = "Anova for Omega Calcite")
 ```
 
-```{r}
-summary(OmeCalcite_model)
-check_model(OmeCalcite_model)
-```
+Base on ANOVA results there is  a difference significance in Omega Calcite within the years. The p-value measure was 9.619e-12. The linear model shows an increasing of Omega Calcite it could be because its more stable structurally than Aragonite(Janiszewska, K., et al2018).  
 
-p-value= 9.619e-12
+**Conclusion**
+
+We could conclude that pCO2 is increasing, but comparing with the pH model isn't increasing the acidification rapidly. On the other hand, the omega Aragonite model and ANOVA showed a significant decrease, but the opposite was shown for omega Calcite.  
+We would have to carry out more analysis to determine this difference because these compounds' only difference is their shape. The primary consequence for the sea surface water in the Bermudas is acidification and the dissolving of calcium carbonate, affecting organisms with calcium carbonate shells and skeletons directly.  
+
+
+**Reference**
+
+ Janiszewska, K., Mazur, M., Machalski, M., & Stolarski, J. (2018). From pristine aragonite to blocky calcite: Exceptional preservation and diagenesis of cephalopod nacre in porous Cretaceous limestones. PloS one, 13(12), e0208598. https://doi.org/10.1371/journal.pone.0208598 
+ 
+Norzagaray-López, C. O., Hernández-Ayón, J. M., Calderon Aguilera, L. E., Reyes-Bonilla, H., Chapa-Balcorta, C., & Ayala-Bocos, A. (2017). Aragonite saturation and pH variation in a fringing reef are strongly influenced by oceanic conditions. Limnology and Oceanography, 62(6), 2375–2388. https://doi.org/10.1002/lno.10571
+
+Rushe, G. J. and Heaton, . Pauline (2021, March 10). Bermuda. Encyclopedia Britannica. https://www.britannica.com/place/Bermuda
+
+
+
+
+

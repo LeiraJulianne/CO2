@@ -84,7 +84,15 @@ view(bats_co2)
 bats_co2 %>% 
   ggplot()+
   geom_point(mapping = aes(x=decy, y=pCO2))+
-  geom_smooth(mapping = aes(x=decy, y=pCO2), method="lm")
+  geom_smooth(mapping = aes(x=decy, y=pCO2), method="lm")+
+  ylab(" pCO2") +
+  xlab("Years")+
+  coord_cartesian(xlim = c(1991,2019))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor= element_blank(),
+        panel.background = element_blank(), #removes annoying gray area
+        axis.line= element_line(colour = "black"), #adds lines for the axes
+        text = element_text(size = 20))
 
 
 #How to cuantify if its increasing? statistics 
@@ -96,7 +104,7 @@ bats_co2 %>%
 #
 ##############Anova %>% p-value=<0.05 hay there's significance difference. 
 
-pco2_model= with(bats_co2,lm(pCO2~I(decy~2000)))
+pco2_model= with(bats_co2,lm(pCO2~I(decy-2000)))
 anova(pco2_model)
 summary(pco2_model)
 check_model(pco2_model)
@@ -122,7 +130,7 @@ bats_co2 %>%
           text = element_text(size = 20))
 
 #How to cuantify if its increasing? statistics 
-pH_model= with(bats_co2, lm(pH~I(decy~2000)))
+pH_model= with(bats_co2, lm(pH~I(decy-2000)))
 anova(pH_model)
 summary(pH_model)
 check_model(pH_model)
@@ -137,7 +145,15 @@ check_model(pH_model)
 bats_co2 %>% 
   ggplot()+
   geom_point(mapping = aes(x=decy, y=OmegaAragonite))+
-  geom_smooth(mapping = aes(x=decy, y=OmegaAragonite), method="lm")
+  geom_smooth(mapping = aes(x=decy, y=OmegaAragonite), method="lm") +
+  ylab(" pH") +
+  xlab("Omega Aragonite")+
+  coord_cartesian(xlim = c(1991,2019))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor= element_blank(),
+        panel.background = element_blank(), #removes annoying gray area
+        axis.line= element_line(colour = "black"), #adds lines for the axes
+        text = element_text(size = 20))
 
 #How to cuantify if its increasing? statistics 
 OmeAragonite_model= with(bats_co2, lm(OmegaAragonite~decy))
@@ -150,7 +166,15 @@ check_model(OmeAragonite_model)
 bats_co2 %>% 
   ggplot()+
   geom_point(mapping = aes(x=decy, y=OmegaCalcite))+
-  geom_smooth(mapping = aes(x=decy, y=OmegaCalcite, method="lm"))
+  geom_smooth(mapping = aes(x=decy, y=OmegaCalcite, method="lm")) +
+  ylab(" Omega Calcite") +
+  xlab("Years")+
+  coord_cartesian(xlim = c(1991,2019))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor= element_blank(),
+        panel.background = element_blank(), #removes annoying gray area
+        axis.line= element_line(colour = "black"), #adds lines for the axes
+        text = element_text(size = 20))
 
 #How to cuantify if its increasing? statistics 
 OmeCalcite_model= with(bats_co2, lm(OmegaCalcite~decy))
